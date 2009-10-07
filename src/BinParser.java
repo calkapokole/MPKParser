@@ -7,6 +7,8 @@ import java.net.URL;
 import java.util.zip.ZipInputStream;
 
 
+// TODO Rozkminic i opisac pola z danymi z plikow binarnych, zmienic nazwy zmiennyh tak,
+// aby mowily jasno co zawiera dane pole 
 public class BinParser {
   
   public static class Data {
@@ -121,7 +123,7 @@ public class BinParser {
 
   private static final String dataFilePath = "file:/home/kojot/Desktop/Internet/Mapa/dane.jar";
   
-  public void old() throws IOException {
+  public void load() throws IOException {
     
     URL dataUrl;
     ZipInputStream dataZipInputStream;
@@ -344,7 +346,7 @@ public class BinParser {
    */
   public static void main(String[] args) throws IOException {
     BinParser parser = new BinParser();
-    parser.old();
+    parser.load();
     
     log("::::::::::");
     

@@ -21,8 +21,8 @@ object WebCrawler {
     tidy.setMakeBare(true)
     tidy.setDropFontTags(true)
     tidy.setIndentContent(false)
-    //tidy.setSpaces(0)
-    //tidy.setTabsize(0)
+    tidy.setSpaces(0)
+    tidy.setTabsize(0)
     tidy.setDropEmptyParas(true)
     // convert
     tidy.parse(in, out)
@@ -47,24 +47,30 @@ object XHTMLParserDemo {
           println("Naglowek: " + col.size + " | " + b.size)
           b.foreach((n:Node) => println(n.text))
         }
-        case 20 => { 
+        case 20 => {
+          // Regular Expresions Spaghetti
+          val minute = """^(\d+)[\s]*""".r
+          val doubleMinute = """^(\d+)[\s]+(\d+)[\s]+""".r
+          val tripleMinute = """^(\d+)[\s]+(\d+)[\s]+(\d+)[\s]+""".r
+          val xChar = """^x""".r
+          val hour = """^[\s]+(\d+)[\s]+""".r
+          val rowTitle = """^[\s]+([a-zA-Z\.]+)[\s]+""".r
           for (el <- col) {
-            println("0: " + el)
-            el match {
-              case <td>
-<b>{g}</b>
-</td> => println("2:" + g)
-              case <td>{c @ _*}</td> => println("1:" + c)
+            //println("0: " + el)
+            /*println("1: " + el.text)
+            for (c:Char <- (el.text)) {
+              printf("|%H|", c.toInt)
+            }
+            println*/
+            el.text match {
+              case minute(d)                => printf(" %d |", d.toInt)
+              case doubleMinute(d1, d2)     => printf(" %d,%d |", d1.toInt, d2.toInt)
+              case tripleMinute(d1, d2, d3) => printf("%d,%d,%d |", d1.toInt, d2.toInt, d3.toInt)
+              case hour(d)                  => printf(" %d |", d.toInt)
+              case rowTitle(s)              => printf("   %s |", s)
+              case xChar                    => printf(" x |")
             }
           }
-          /*
-          catalog match {
-            case <catalog>{therms @ _*}</catalog> =>
-              for (therm @ <cctherm>{_*}</cctherm> <- therms)
-                println("processing: "+
-                        (therm \ "description").text)
-          }*/
-
           println
         }
       }
@@ -73,6 +79,7 @@ object XHTMLParserDemo {
     println(rows2.size)
   }
   
+  // przykladowa funkcja z tail-recursion
   def factorial(n: Int): Int = {
     def factorialAcc(acc: Int, n: Int): Int = {
       if (n <= 1) acc
