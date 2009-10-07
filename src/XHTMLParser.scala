@@ -32,7 +32,7 @@ object WebCrawler {
 
 object XHTMLParserDemo {
   def main(args: Array[String]) = {
-    val url = new URI("http://ztm.kielce.pl/pl/rozklady/0028/0028t050.htm")
+    val url = new URI("http://ztm.kielce.pl/pl/rozklady/0028/0028t001.htm")
     val doc = WebCrawler.getXMLfromURL(url.toURL)
     // Get interesting rows (and drop the first one)
     val rows2 = (doc \ "body" \ "table" \ "tr" \ "td" \ "table" drop 1) \ "tr"
@@ -47,29 +47,38 @@ object XHTMLParserDemo {
           println("Naglowek: " + col.size + " | " + b.size)
           b.foreach((n:Node) => println(n.text))
         }
-        case 20 => {
+        case 19 | 20 => {
           // Regular Expresions Spaghetti
-          val minute = """^(\d+)[\s]*""".r
-          val doubleMinute = """^(\d+)[\s]+(\d+)[\s]+""".r
-          val tripleMinute = """^(\d+)[\s]+(\d+)[\s]+(\d+)[\s]+""".r
-          val xChar = """^x""".r
+          val minute = """^(\d+)([a-zA-Z]?)[\s]*""".r
+          val doubleMinute = """^(\d+)([a-zA-Z]?)[\s]+(\d+)([a-zA-Z]?)[\s]+""".r
+          val tripleMinute = """^(\d+)([a-zA-Z]?)[\s]+(\d+)([a-zA-Z]?)[\s]+(\d+)([a-zA-Z]?)[\s]+""".r
+          val xChar = """^x$""".r
           val hour = """^[\s]+(\d+)[\s]+""".r
           val rowTitle = """^[\s]+([a-zA-Z\.]+)[\s]+""".r
           for (el <- col) {
             //println("0: " + el)
-            /*println("1: " + el.text)
+            //print("1: %s ", el.text)
             for (c:Char <- (el.text)) {
               printf("|%H|", c.toInt)
             }
-            println*/
+            print(" -> |")
             el.text match {
-              case minute(d)                => printf(" %d |", d.toInt)
-              case doubleMinute(d1, d2)     => printf(" %d,%d |", d1.toInt, d2.toInt)
-              case tripleMinute(d1, d2, d3) => printf("%d,%d,%d |", d1.toInt, d2.toInt, d3.toInt)
-              case hour(d)                  => printf(" %d |", d.toInt)
-              case rowTitle(s)              => printf("   %s |", s)
-              case xChar                    => printf(" x |")
+              case minute(d, c)
+                => printf(" %d%s |", d.toInt, if(c == null) "" else " " + c)
+              case doubleMinute(d1, c1, d2, c2)
+                => printf(" %d%s,%d%s |", 
+                          d1.toInt, if(c1 == null) "" else " " + c1, 
+                          d2.toInt, if(c2 == null) "" else " " + c2)
+              case tripleMinute(d1, c1, d2, c2, d3, c3)
+                => printf("%d%s,%d%s,%d%s |",
+                          d1.toInt, if(c1 == null) "" else " " + c1, 
+                          d2.toInt, if(c2 == null) "" else " " + c2,
+                          d3.toInt, if(c3 == null) "" else " " + c3)
+              case hour(d) => printf(" %d |", d.toInt)
+              case rowTitle(s) => printf("   %s |", s)
+              case xChar => printf(" x |")
             }
+            println
           }
           println
         }
